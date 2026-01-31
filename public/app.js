@@ -91,33 +91,65 @@ document.addEventListener('DOMContentLoaded', () => {
     formData.append('documentType', 'receipt');
     formData.append('region', 'jp');
 
-    const response = await fetch(`${WORKER_URL}/upload`, {
-      method: 'POST',
-      headers: { 'apikey': apiKey },
-      body: formData
-    });
+    let response;
+    try {
+      response = await fetch(`${WORKER_URL}/upload`, {
+        method: 'POST',
+        headers: { 'apikey': apiKey },
+        body: formData
+      });
+    } catch (e) {
+      throw new Error(`ネットワークエラー: ${e.message}`);
+    }
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || data.error || 'アップロードに失敗しました');
-    if (!data.token) throw new Error('トークンが取得できませんでした');
+    let data;
+    const text = await response.text();
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(`レスポンス解析エラー (${response.status}): ${text.slice(0, 200)}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(`アップロードエラー (${response.status}): ${JSON.stringify(data)}`);
+    }
+    if (!data.token) {
+      throw new Error(`トークン未取得: ${JSON.stringify(data)}`);
+    }
     return data.token;
   }
 
   async function pollResult(token, apiKey, maxAttempts = 60) {
     for (let i = 0; i < maxAttempts; i++) {
-      const response = await fetch(`${WORKER_URL}/result/${token}`, {
-        method: 'GET',
-        headers: { 'apikey': apiKey }
-      });
+      let response;
+      try {
+        response = await fetch(`${WORKER_URL}/result/${token}`, {
+          method: 'GET',
+          headers: { 'apikey': apiKey }
+        });
+      } catch (e) {
+        throw new Error(`ネットワークエラー (attempt ${i + 1}): ${e.message}`);
+      }
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || data.error || '結果の取得に失敗しました');
+      let data;
+      const text = await response.text();
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(`レスポンス解析エラー (${response.status}): ${text.slice(0, 200)}`);
+      }
+
+      if (!response.ok) {
+        throw new Error(`結果取得エラー (${response.status}): ${JSON.stringify(data)}`);
+      }
       if (data.status === 'done') return data.result;
-      if (data.status === 'failed') throw new Error('解析に失敗しました');
+      if (data.status === 'failed') {
+        throw new Error(`解析失敗: ${JSON.stringify(data)}`);
+      }
 
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    throw new Error('タイムアウト: 解析に時間がかかりすぎています');
+    throw new Error(`タイムアウト: ${maxAttempts}秒経過。token=${token}`);
   }
 
   function displayResult(result) {

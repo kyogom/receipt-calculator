@@ -137,7 +137,12 @@ h1 {
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 24px;
-  text-align: center;
+  text-align: left;
+  font-size: 0.8rem;
+  word-break: break-all;
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 /* 結果エリア */
