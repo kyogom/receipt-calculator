@@ -134,19 +134,29 @@ document.addEventListener('DOMContentLoaded', () => {
     lineItems.forEach((item, index) => {
       const name = item.descClean || item.desc || '不明な項目';
       const price = parseFloat(item.lineTotal || item.price) || 0;
-      items.push({ name, price, checked: false });
+      items.push({ name, price, mode: 'half' }); // none, half, full
 
       const itemEl = document.createElement('div');
       itemEl.className = 'item';
       itemEl.innerHTML = `
-        <input type="checkbox" id="item-${index}" data-index="${index}">
-        <label for="item-${index}" class="item-name">${escapeHtml(name)}</label>
-        <span class="item-price">${formatNumber(price)}円</span>
+        <div class="item-info">
+          <span class="item-name">${escapeHtml(name)}</span>
+          <span class="item-price">${formatNumber(price)}円</span>
+        </div>
+        <div class="segment-control" data-index="${index}">
+          <button data-mode="half" class="active">割勘</button>
+          <button data-mode="full">立替</button>
+          <button data-mode="none">除外</button>
+        </div>
       `;
 
-      itemEl.querySelector('input').addEventListener('change', (e) => {
-        items[index].checked = e.target.checked;
-        calculateTotal();
+      itemEl.querySelectorAll('.segment-control button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          itemEl.querySelectorAll('.segment-control button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          items[index].mode = btn.dataset.mode;
+          calculateTotal();
+        });
       });
 
       itemsList.appendChild(itemEl);
@@ -158,7 +168,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function calculateTotal() {
     const taxRate = parseFloat(document.querySelector('input[name="tax-rate"]:checked')?.value || 0) / 100;
-    const subtotal = items.filter(i => i.checked).reduce((sum, i) => sum + i.price, 0);
+    const subtotal = items.reduce((sum, i) => {
+      if (i.mode === 'half') return sum + i.price;
+      if (i.mode === 'full') return sum + i.price * 2;
+      return sum;
+    }, 0);
     totalAmount.textContent = formatNumber(Math.round(subtotal * (1 + taxRate)));
   }
 

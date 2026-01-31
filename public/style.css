@@ -161,32 +161,64 @@ h1 {
 
 .item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid #eee;
+  gap: 8px;
 }
 
 .item:last-child {
   border-bottom: none;
 }
 
-.item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  margin-right: 12px;
-  cursor: pointer;
-  accent-color: #3498db;
+.item-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .item-name {
-  flex: 1;
   font-size: 0.9375rem;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .item-price {
   font-weight: bold;
   font-size: 0.9375rem;
   color: #2c3e50;
+}
+
+.segment-control {
+  display: flex;
+  border: 1px solid #3498db;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.segment-control button {
+  padding: 6px 12px;
+  border: none;
+  background: white;
+  color: #3498db;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-right: 1px solid #3498db;
+}
+
+.segment-control button:last-child {
+  border-right: none;
+}
+
+.segment-control button.active {
+  background: #3498db;
+  color: white;
+}
+
+.segment-control button:hover:not(.active) {
+  background: #ebf5fb;
 }
 
 /* 税率選択 */
