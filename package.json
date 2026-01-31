@@ -1,0 +1,6 @@
+{
+  "name": "receipt-calculator",
+  "version": "1.0.0",
+  "description": "レシート割り勘計算ツール",
+  "private": true
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>レシート割り勘計算</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>レシート割り勘計算</h1>
+
+    <!-- API Key入力 -->
+    <div class="api-key-area">
+      <input type="password" id="api-key-input" placeholder="TabScanner API Key">
+      <button id="save-api-key" class="save-button">保存</button>
+    </div>
+
+    <!-- アップロードエリア -->
+    <div class="upload-area">
+      <label for="file-input" class="upload-button">
+        レシート画像をアップロード
+      </label>
+      <input type="file" id="file-input" accept="image/jpeg,image/png" hidden>
+      <p class="file-name" id="file-name"></p>
+      <button id="load-mock" class="mock-button">Load Mock Data</button>
+    </div>
+
+    <!-- ローディング表示 -->
+    <div class="loading" id="loading" hidden>
+      <div class="spinner"></div>
+      <p>解析中...</p>
+    </div>
+
+    <!-- エラー表示 -->
+    <div class="error" id="error" hidden></div>
+
+    <!-- 結果表示エリア -->
+    <div class="result-area" id="result-area" hidden>
+      <h2>解析結果</h2>
+
+      <!-- 項目リスト -->
+      <div class="items-list" id="items-list"></div>
+
+      <!-- 税率選択 -->
+      <div class="tax-selector">
+        <h3>税率</h3>
+        <div class="tax-options">
+          <label>
+            <input type="radio" name="tax-rate" value="0" checked>
+            税込 (+0%)
+          </label>
+          <label>
+            <input type="radio" name="tax-rate" value="8">
+            軽減税 (+8%)
+          </label>
+          <label>
+            <input type="radio" name="tax-rate" value="10">
+            税 (+10%)
+          </label>
+        </div>
+      </div>
+
+      <!-- 合計金額 -->
+      <div class="total-area">
+        <div class="total-display">
+          <span class="total-label">合計:</span>
+          <span class="total-amount" id="total-amount">0</span>
+          <span class="total-currency">円</span>
+        </div>
+        <button class="copy-button" id="copy-button">コピー</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
